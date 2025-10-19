@@ -12,7 +12,9 @@ from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth import get_user_model
 from .models import CustomUser,Team
 from .serializers import RegisterSerializer, ResetPasswordSerializer, TeamSerializer
-
+from django.utils import timezone
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 User = get_user_model()
 
 
@@ -220,3 +222,30 @@ def user_me(request):
             "is_active": user.is_active,
         }
     )
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_user_info(request):
+    user = request.user
+
+    # ✅ Automatically downgrade expired subscription
+    if user.user_type == "subscription" and user.subscription_end:
+        if user.subscription_end < timezone.now():
+            user.user_type = "basic"
+            user.subscription_end = None
+            user.save(update_fields=["user_type", "subscription_end"])
+
+    # ✅ Return user info for Flutter
+    user_info = {
+        "username": user.username,
+        "email": user.email,
+        "user_type": user.user_type,
+        "subscription_end": (
+            user.subscription_end.isoformat() if user.subscription_end else None
+        ),
+        "is_staff": user.is_staff,
+        "is_superuser": user.is_superuser,
+    }
+
+    return Response(user_info)

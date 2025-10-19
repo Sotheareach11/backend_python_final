@@ -5,6 +5,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from bakong_khqr import KHQR
 from .models import PaymentTransaction
+from django.utils import timezone
+from datetime import timedelta
 from django.contrib.auth import get_user_model
 import json
 
@@ -41,15 +43,6 @@ def generate_khqr(request):
     # ✅ Construct public URL for Flutter
     qr_image_url = request.build_absolute_uri(f"/media/khqr/{md5}.png")
 
-    # Optionally save transaction
-    # PaymentTransaction.objects.create(
-    #     bill_number='TRX01234567',
-    #     amount=0.01,
-    #     currency='USD',
-    #     md5_hash=md5,
-    #     qr_string=qr_string,
-    #     status=payment_status,
-    # )
 
     return JsonResponse({
         "qr": qr_string,
@@ -97,9 +90,16 @@ def check_payment_status(request):
         try:
             user = User.objects.get(id=user_id)
             user.user_type = "subscription"
-            user.save()
+            if user.subscription_end and user.subscription_end > timezone.now():
+                user.subscription_end += timedelta(days=30)
+            else:
+                # Case 2: if expired or never set → start new 30 days from today
+                user.subscription_end = timezone.now() + timedelta(days=30)
+
+            user.save(update_fields=["user_type", "subscription_end"])
         except User.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
+        
 
     return JsonResponse({
         "md5": md5,
