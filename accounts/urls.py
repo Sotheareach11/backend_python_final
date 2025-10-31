@@ -1,5 +1,9 @@
 from django.urls import path,include
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 from .views import get_user_info,user_me,RegisterView, VerifyEmailView, LoginView, ForgotPasswordView, ResetPasswordView, UserViewSet, TeamViewSet,UserViewSet, TeamViewSet
 
 router = DefaultRouter()
@@ -14,6 +18,10 @@ urlpatterns = [
     path('reset-password/<uidb64>/<token>/', ResetPasswordView.as_view(), name='reset-password'),
     path('users/me/', user_me, name='user-me'),
     path("users/info/", get_user_info, name="user-info"),
+
+    # 🔄 JWT token endpoints (needed for Flutter refresh)
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
 urlpatterns += router.urls

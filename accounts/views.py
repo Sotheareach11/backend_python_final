@@ -22,6 +22,7 @@ User = get_user_model()
 # AUTH & REGISTRATION
 # -----------------------------
 class RegisterView(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
     serializer_class = RegisterSerializer
 
     def perform_create(self, serializer):
@@ -38,6 +39,7 @@ class RegisterView(generics.CreateAPIView):
 
 
 class VerifyEmailView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
     def get(self, request, token):
         try:
             decoded = AccessToken(token)
@@ -80,6 +82,8 @@ class LoginView(TokenObtainPairView):
 # PASSWORD RESET
 # -----------------------------
 class ForgotPasswordView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+
     def post(self, request):
         email = request.data.get("email")
         try:
@@ -101,6 +105,7 @@ class ForgotPasswordView(generics.GenericAPIView):
 
 
 class ResetPasswordView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
     serializer_class = ResetPasswordSerializer
 
     def post(self, request, uidb64, token):
