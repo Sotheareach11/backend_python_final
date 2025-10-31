@@ -28,7 +28,7 @@ class RegisterView(generics.CreateAPIView):
     def perform_create(self, serializer):
         user = serializer.save()
         token = RefreshToken.for_user(user).access_token
-        domain = get_current_site(self.request).domain
+        # domain = get_current_site(self.request).domain
         verify_url = f"http://127.0.0.1:8000/api/auth/verify/{token}/"
         send_mail(
             "Verify Email",
