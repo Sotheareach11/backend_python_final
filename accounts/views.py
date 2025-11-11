@@ -168,16 +168,23 @@ class TeamViewSet(viewsets.ModelViewSet):
         team = self.get_object()
         user_id = request.data.get("user_id")
 
-        if user.teams.count() == 0:
-            user.user_type = 'basic'
-            user.save()
+        if not user_id:
+            return Response({"error": "User ID is required"}, status=400)
 
         try:
             user = User.objects.get(id=user_id)
-            team.members.remove(user)
-            return Response({"message": f"{user.username} removed from {team.name}."})
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
+
+        # ✅ Remove user from team first
+        team.members.remove(user)
+
+        # ✅ If the user has no teams left, downgrade them to basic
+        if user.teams.count() == 0:
+            user.user_type = 'basic'
+            user.save(update_fields=['user_type'])
+
+        return Response({"message": f"{user.username} removed from {team.name}."})
 
 
 # -----------------------------

@@ -90,11 +90,10 @@ def check_payment_status(request):
         try:
             user = User.objects.get(id=user_id)
             user.user_type = "subscription"
-            if user.subscription_end and user.subscription_end > timezone.now():
+            if user.subscription_end and user.subscription_end > timezone.localdate():
                 user.subscription_end += timedelta(days=30)
             else:
-                # Case 2: if expired or never set → start new 30 days from today
-                user.subscription_end = timezone.now() + timedelta(days=30)
+                user.subscription_end = timezone.localdate() + timedelta(days=30)
 
             user.save(update_fields=["user_type", "subscription_end"])
         except User.DoesNotExist:
