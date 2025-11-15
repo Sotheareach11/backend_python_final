@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Payment Success</title>
+  </head>
+  <body>
+    {% if txn.status == "PAID" %}
+    <h1>🎉 Payment Successful</h1>
+    <p>Your subscription is now active!</p>
+    <p><strong>Bill:</strong> {{ txn.bill_number }}</p>
+    {% else %}
+    <h1>⏳ Processing Payment…</h1>
+    <p>Your payment is being verified. Refresh shortly.</p>
+    {% endif %}
+  </body>
+</html>

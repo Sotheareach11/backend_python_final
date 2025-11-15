@@ -7,8 +7,8 @@ class PaymentTransaction(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=10)
     md5_hash = models.CharField(max_length=64)
-    qr_string = models.TextField()
-    deeplink = models.URLField()
+    qr_string = models.TextField(blank=True)
+    deeplink = models.URLField(blank=True)
     status = models.CharField(max_length=20, default="UNPAID")
     created_at = models.DateTimeField(auto_now_add=True)
 

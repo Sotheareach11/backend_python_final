@@ -3,6 +3,8 @@ from datetime import timedelta
 from pathlib import Path
 import os
 from datetime import timedelta
+import stripe
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -109,10 +111,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # STRIPE_SECRET_KEY = "sk_test_XXXX"
 # STRIPE_WEBHOOK_SECRET = "whsec_XXXX"
-STRIPE_SECRET_KEY = "sk_test_..."
-STRIPE_PUBLISHABLE_KEY = "pk_test_..."
-STRIPE_WEBHOOK_SECRET = "whsec_..."
+# Stripe Configuration
+# Stripe Configuration
 
+# Load environment variables
+load_dotenv()
+
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET = "whsec_tQv6PBWzqh2FtBiFO8KkQagccl5Kk2lV"
+
+stripe.api_key = STRIPE_SECRET_KEY
 
 CRONJOBS = [
     ('0 * * * *', 'accounts.cron.auto_downgrade_users'),
